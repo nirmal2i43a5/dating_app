@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from dating_app.models import Profile
+from django.db.models import  Q
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -60,7 +61,59 @@ class ChangePasswordSerializer(serializers.Serializer):
     
     
     
+# ---------------------------
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(allow_blank=True, read_only=True)
+    username = serializers.CharField()
+    # email = serializers.EmailField(label='Email Address')
     
-#for chat serializers
-class ChatSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            # 'email',
+            'password',
+            'token',
+            
+        ]
+        # extra_kwargs = {"password":
+        #                     {"write_only": True}
+        #                     }
+        
+    # #validate for incorrect details
+    # def validate(self, data):#data is built in dict
+    #     user_obj=None
+    #     email = data.get('email',None)#if no email then None
+    #     username = data.get('username',None)
+    #     password = data.get('password')
+        
+    #     if not email and not username:
+    #         raise ValidationError("A username and email is required to login")
+        
+    #     user = User.objects.filter(Q(email=email)|
+    #                                Q(username=username)).distinct()
+        
+        
+        
+    #     user = user.exclude(email__isnull=True).exclude(email__iexact='')#it excludes null email and give relevant output
+    #     print(user)
+    #     if user.exists() and user.count() == 1:
+            
+    #         user_obj = user.first()#only one user obj so we set first
+    #     else:
+    #         raise ValidationError("The email/username is not valid")
+            
+    #     if user_obj:
+    #         if not user_obj.check_password(password):
+    #             raise ValidationError("Incorrect credentials please try again")
+    #     #otherwise
+    #     data['token'] = "random token"
+        
+            
+    #     email = data['email']
+    #     user_qs = User.objects.filter(email=email)
+    #     if user_qs.exists():
+    #         raise ValidationError("This user has already registered.")
+    #     return data
+    

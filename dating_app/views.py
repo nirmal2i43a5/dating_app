@@ -4,11 +4,15 @@ from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, CustomProfileRegister
+from .serializers import UserSerializer, RegisterSerializer, CustomProfileRegister, UserLoginSerializer
 from django.shortcuts import HttpResponse
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+# from rest_framework.authentication import CsrfExemptSessionAuthentication, BasicAuthentication 
+from braces.views import CsrfExemptMixin
+
 # from dating_app.models import Profile
 
 # Register API
@@ -24,7 +28,6 @@ class Register(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
        
 
-
 @api_view(['GET'])
 def ListUserDetail(request):
     serializer = User.objects.all()
@@ -36,18 +39,39 @@ from django.contrib.auth import login
 from rest_framework import permissions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
+from rest_framework.authentication import BasicAuthentication
+from django.views.decorators.csrf import csrf_exempt
 
-class Login(KnoxLoginView):
-    # permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
-        serializer = AuthTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return HttpResponse('Wellcome You are Login')
-        #return super(LoginAPI, self).post(request, format=None)
+# class Login(CsrfExemptMixin, KnoxLoginView):
+#     # permission_classes = (permissions.AllowAny,)
+#     # authentication_classes = [BasicAuthentication]
+#     serializer_class = UserLoginSerializer
+#     # authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         serializer = AuthTokenSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         login(request, user)
+#         return HttpResponse(user)
+#         return super(Login, self).post(request, format=None)
 
+class Login(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = UserLoginSerializer
+    
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer = UserLoginSerializer(data=data)
+        
+        if serializer.is_valid(raise_exception=True):
+            # serializer.save()
+            new_data = serializer.data
+            return Response(new_data, status=HTTP_200_OK)
+        
+        #if invalid
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 ## To change password
@@ -95,6 +119,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     
     
 class Logout(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request, format=None):
         # simply delete the token to force a login
         request.user.auth_token.delete()

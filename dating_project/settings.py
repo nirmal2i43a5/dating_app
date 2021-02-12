@@ -25,7 +25,7 @@ SECRET_KEY = 'u@gy9%#=%3_dlv4c%knwfmqi!n2w!kt82s8f+cy#6dg5vpxac#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -136,7 +136,7 @@ CHANNEL_LAYERS = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'knox.auth.TokenAuthentication',
     ]
 }
