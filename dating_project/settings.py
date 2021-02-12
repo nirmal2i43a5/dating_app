@@ -25,7 +25,7 @@ SECRET_KEY = 'u@gy9%#=%3_dlv4c%knwfmqi!n2w!kt82s8f+cy#6dg5vpxac#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     #third party
     'rest_framework',
     'knox',
-    'django_rest_passwordreset'
+    'django_rest_passwordreset',
+        # 'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dating_project.wsgi.application'
+# ASGI_APPLICATION = 'dating_app.routing.application'
 
 
 # Database

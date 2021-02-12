@@ -19,6 +19,8 @@ class Profile(models.Model):
     usercode = models.CharField(max_length=100)
     created = models.DateField(auto_now_add=True)
 
+
+
 class Message(models.Model):
     sender = models.OneToOneField(Profile,on_delete=models.CASCADE,related_name='sender')
     receiver = models.OneToOneField(Profile,on_delete=models.CASCADE,related_name='receiver')
