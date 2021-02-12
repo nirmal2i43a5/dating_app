@@ -8,6 +8,8 @@ constantly==15.1.0
 cryptography==3.4.4
 daphne==3.0.1
 Django==3.1.6
+django-rest-knox==4.1.0
+django-rest-passwordreset==1.1.0
 djangorestframework==3.12.2
 hyperlink==21.0.0
 idna==3.1
