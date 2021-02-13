@@ -26,8 +26,9 @@ class Profile(models.Model):
 
 
 class Message(models.Model):
-    sender = models.OneToOneField(User,on_delete=models.CASCADE,related_name='sender',null=True)
-    receiver = models.OneToOneField(User,on_delete=models.CASCADE,related_name='receiver')
+    # sender = models.OneToOneField(User,on_delete=models.CASCADE,related_name='sender',null=True)
+    # receiver = models.OneToOneField(User,on_delete=models.CASCADE,related_name='receiver')
+    to = models.ForeignKey(User,on_delete=models.CASCADE, null=True)
     content = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to="images/messages",
@@ -42,8 +43,8 @@ class Chat(models.Model):
     participants = models.ManyToManyField(User, null = True)
     messages = models.ManyToManyField(Message, null = True)
     
-    def __str__(self):
-        return ''.join(self.messages.content)
+    # def __str__(self):
+    #     return ''.join(self.messages.content)
     
     
     

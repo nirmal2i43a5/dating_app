@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import permissions
+from django.shortcuts import get_object_or_404
 from rest_framework import  generics
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated,AllowAny
@@ -33,14 +34,7 @@ class ChatListView(ListAPIView):
         return queryset
     
     
-# @permission_classes((IsAuthenticated,))
-# @api_view(['GET'])
-# def ChatListView(request):#we send post data
-# 	serializer = ChatSerializer(data=request.data)#in models forms we do request.POST in restful ---request.data return json object
-# 	if serializer.is_valid():#in restful we save form and is sililar concept
-# 		serializer.save()
 
-# 	return Response(serializer.data)
 
 class ChatDetailView(RetrieveAPIView):
     queryset = Chat.objects.all()
@@ -54,10 +48,11 @@ class ChatDetailView(RetrieveAPIView):
 class ChatCreateView(CreateAPIView):
     # queryset = Chat.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    # permission_classes = (permissions.IsAuthenticated, )
 
       
     def post(self, request, *args, **kwargs):
+       
         data = request.data
         serializer = MessageSerializer(data=data)
         
@@ -71,20 +66,19 @@ class ChatCreateView(CreateAPIView):
     
 
 
-# @api_view(['POST'])
-# def ChatCreateView(request):#we send post data
-# 	serializer = ChatSerializer(data=request.data)#in models forms we do request.POST in restful ---request.data return json object
-# 	print(f'--------------{serializer}--------------------')
-
-# 	if serializer.is_valid():#in restful we save form and is sililar concept
-# 		serializer.save()
-
-# 	return Response(serializer.data)
 
 class ChatUpdateView(UpdateAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
+
+
+# class ChatUpdateView(CreateAPIView):
+#     # queryset = Chat.objects.all()
+#     serializer_class = MessageSerializer
+#     # permission_classes = (permissions.IsAuthenticated, )
+
 
 
 class ChatDeleteView(DestroyAPIView):

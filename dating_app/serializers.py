@@ -6,6 +6,18 @@ from django.contrib.auth.models import User
 from dating_app.models import Profile
 from django.db.models import  Q
 
+
+from rest_framework.serializers import (
+    CharField,
+    EmailField,
+    
+    HyperlinkedIdentityField,
+    ModelSerializer,
+    SerializerMethodField,
+    ValidationError
+    )
+
+
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,13 +31,14 @@ class CustomProfileRegister(serializers.ModelSerializer):
         fields = ('phone','dob','gender','looking_for','avatar')
 
 # Register Serializer
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.HyperlinkedModelSerializer):
     profile = CustomProfileRegister(required=True)
     
     class Meta:
         model = User
         fields = ('id','first_name','last_name','username', 'email', 'password','profile',)
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True},
+                        }
 
 
     def create(self, validated_data):
@@ -63,6 +76,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     
 # ---------------------------
 
+
 class UserLoginSerializer(serializers.ModelSerializer):
     token = serializers.CharField(allow_blank=True, read_only=True)
     username = serializers.CharField()
@@ -77,43 +91,51 @@ class UserLoginSerializer(serializers.ModelSerializer):
             'token',
             
         ]
-        # extra_kwargs = {"password":
-        #                     {"write_only": True}
-        #                     }
+        extra_kwargs = {"password":
+                            {"write_only": True}
+                            }
         
     # #validate for incorrect details
-    # def validate(self, data):#data is built in dict
-    #     user_obj=None
-    #     email = data.get('email',None)#if no email then None
-    #     username = data.get('username',None)
-    #     password = data.get('password')
+    def validate(self, data):#data is built in dict
+        user_obj=None
+        # email = data.get('email',None)#if no email then None
+        username = data.get('username',None)
+        password = data.get('password')
         
-    #     if not email and not username:
-    #         raise ValidationError("A username and email is required to login")
+        if not username:
+            raise ValidationError("A username and email is required to login")
         
-    #     user = User.objects.filter(Q(email=email)|
-    #                                Q(username=username)).distinct()
+        user = User.objects.filter(
+                                   Q(username=username)).distinct()
         
         
         
-    #     user = user.exclude(email__isnull=True).exclude(email__iexact='')#it excludes null email and give relevant output
-    #     print(user)
-    #     if user.exists() and user.count() == 1:
+        user = user.exclude(username__iexact='')#it excludes null email and give relevant output
+        print(user)
+        if user.exists() and user.count() == 1:
             
-    #         user_obj = user.first()#only one user obj so we set first
-    #     else:
-    #         raise ValidationError("The email/username is not valid")
+            user_obj = user.first()#only one user obj so we set first
+        else:
+            raise ValidationError("The username is not valid")
             
-    #     if user_obj:
-    #         if not user_obj.check_password(password):
-    #             raise ValidationError("Incorrect credentials please try again")
-    #     #otherwise
-    #     data['token'] = "random token"
+        if user_obj:
+            if not user_obj.check_password(password):
+                raise ValidationError("Incorrect credentials please try again")
+        #otherwise
+        data['token'] = "random token"
         
-            
-    #     email = data['email']
-    #     user_qs = User.objects.filter(email=email)
-    #     if user_qs.exists():
-    #         raise ValidationError("This user has already registered.")
-    #     return data
+        user_qs = User.objects.filter(username=username)
+        
+        if user_qs.exists():
+            raise ValidationError("This user has already login.")
+        return data
     
+
+class DetailSerializer(serializers.HyperlinkedModelSerializer):
+    url = detail_url = HyperlinkedIdentityField(
+        view_name='chat:detail-user',#where to go
+        # lookup_field = 'slug'##id is default but here we use slug
+    )
+    class Meta:
+        model = User
+        fields = '__all__'

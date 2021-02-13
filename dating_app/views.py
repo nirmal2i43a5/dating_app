@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+
 
 # Create your views here.
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, CustomProfileRegister, UserLoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, CustomProfileRegister, UserLoginSerializer, DetailSerializer
 from django.shortcuts import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
@@ -33,6 +34,12 @@ def ListUserDetail(request):
     serializer = User.objects.all()
     user_data = RegisterSerializer(serializer, many = True)
     return Response(user_data.data)
+
+@api_view(['GET'])
+def DetailUser(request, pk):
+    serializer = get_object_or_404(User,id = pk)
+    user_data = RegisterSerializer(serializer, many = False)
+    return Response(user_data.data)
     
         
 from django.contrib.auth import login
@@ -44,11 +51,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 # class Login(CsrfExemptMixin, KnoxLoginView):
-#     # permission_classes = (permissions.AllowAny,)
-#     # authentication_classes = [BasicAuthentication]
-#     serializer_class = UserLoginSerializer
-#     # authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
-#     @csrf_exempt
+#     permission_classes = (permissions.AllowAny,)
+#     authentication_classes = [BasicAuthentication]
+#     # serializer_class = UserLoginSerializer
+ 
 #     def post(self, request, format=None):
 #         serializer = AuthTokenSerializer(data=request.data)
 #         serializer.is_valid(raise_exception=True)
@@ -56,7 +62,9 @@ from django.views.decorators.csrf import csrf_exempt
 #         login(request, user)
 #         return HttpResponse(user)
 #         return super(Login, self).post(request, format=None)
-
+    
+    
+    
 class Login(APIView):
     permission_classes = [AllowAny]
     serializer_class = UserLoginSerializer
@@ -66,7 +74,7 @@ class Login(APIView):
         serializer = UserLoginSerializer(data=data)
         
         if serializer.is_valid(raise_exception=True):
-            # serializer.save()
+            serializer.save()
             new_data = serializer.data
             return Response(new_data, status=HTTP_200_OK)
         
@@ -75,7 +83,7 @@ class Login(APIView):
 
 
 ## To change password
-from rest_framework import status
+from rest_framework import status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 from rest_framework import generics
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -116,8 +124,8 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
+
 class Logout(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, format=None):

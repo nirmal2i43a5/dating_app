@@ -17,7 +17,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ('sender','receiver','content',)
+        fields = ('to','content',)
         # fields = ('id', 'content', 'participants')
         # read_only = ('id')
         # lookup_field = 'messages'
